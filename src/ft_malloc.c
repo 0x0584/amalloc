@@ -1,0 +1,40 @@
+#include "ft_malloc.h"
+
+static inline t_ptr_page	active_page(t_ptr_page page, size_t size) {
+  while (page->next != NULL && page->available > size) {
+    page = page->next;
+  }
+  return page;
+}
+
+void				*ft_malloc(size_t size) {
+  t_ptr_page page;
+  int index;
+
+  index = arena_init(size);
+  page = active_page(&g_arena[index], size);
+  if (size <= TINY_CHUNK_SIZE) {
+    page_alloc_tiny_chunk(page, size);
+  } else if (size <= CHUNK_SIZE) {
+    page_alloc_chunk(page, size);
+  } else {
+    page_alloc_large_chunk(page, size);
+  }
+  return NULL;
+}
+
+void				*ft_realloc(void *ptr, size_t size) {
+  if (ptr == NULL && size != 0) {
+    return ft_malloc(size);
+  } else if (ptr != NULL && size == 0) {
+    ft_free(ptr);
+    return ptr;
+  }
+
+  assert(is_valid_memory_ptr(ptr));
+  return NULL;
+}
+
+void				*ft_calloc(size_t n_elems, size_t size) {
+  return ft_malloc(size * n_elems);
+}
