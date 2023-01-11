@@ -42,20 +42,25 @@ static inline t_ptr_page	best_fit_page(t_ptr_page page, size_t size) {
 typedef t_ptr_page	(*t_fetch_algorithm)(t_ptr_page page, size_t size);
 static t_fetch_algorithm fetch_page = first_fit_page;
 
-void				*ft_malloc(size_t size) {
-  t_ptr_page	page;
-  int		index;
+t_ptr_page fetch_page_hook(size_t size) {
+	register int		index;
 
-  index = arena_init(size);
-  page = fetch_page(&g_arena[index], size);
-  if (size <= TINY_CHUNK_SIZE) {
-    page_alloc_tiny_chunk(page, size);
-  } else if (size <= CHUNK_SIZE) {
-    page_alloc_chunk(page, size);
-  } else {
-    page_alloc_large_chunk(page, size);
-  }
-  return NULL;
+	index = arena_init(size);
+	return fetch_page(g_arena + index, size);
+}
+
+void				*ft_malloc(size_t size) {
+	t_ptr_page	page;
+
+	page = fetch_page_hook(size);
+	if (size <= TINY_CHUNK_SIZE) {
+		page_alloc_tiny_chunk(page, size);
+	} else if (size <= CHUNK_SIZE) {
+		page_alloc_chunk(page, size);
+	} else {
+		page_alloc_large_chunk(page, size);
+	}
+	return NULL;
 }
 
 void				*ft_realloc(void *ptr, size_t size) {

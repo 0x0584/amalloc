@@ -85,8 +85,9 @@ int				arena_init(t_ptr_page arena);
 
 #define ZONE_NUM_ELEMENTS 128
 
-#define TINY_ZONE_MAX_SIZE 32
-#define SMALL_ZONE_MAX_SIZE 512
-#define LARGE_ZONE_MAX_SIZE 4096
+// FIXME: make max_sizes relative to sys_page_size
+#define TINY_ZONE_MAX_SIZE size_offset(32)
+#define SMALL_ZONE_MAX_SIZE size_offset(512)
+#define LARGE_ZONE_MAX_SIZE size_offset(2048)
 
 #endif /* MEMORY_H */
