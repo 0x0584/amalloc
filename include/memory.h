@@ -8,36 +8,8 @@
 #include <sys/mman.h>
 #include <stdbool.h>
 
-/*
-
-    page of size page_size
-
-     +-------------+<--------------------------| base pointer returned by mmap
-     | layout      +------+
-     | quota       |	  |
-     | next page   |+-----v------+
-     +-------------+| ptr        +-------+  ptr always points to the offset of the base pointer
-                    | size       | 	 |  size without the offset
-                    | available  |     	 |  true if the chunk is free
-             +------+ next       |	 |  points to the next chunk, or NULL if it is the last
-             |      | ~~~~~~~~   <-------+
-             |      | ~~~~~~~    |
-             |      | ~~~~~~~~   |
-             |      | ~~~~~~~~~  |
-             |      | ~~~~~~~    |
-             +------> ptr        +-------+
-                    | size       |       |
-                    | available  |       |
-        NULL <------+ next       |       |
-                    |            <-------+
-                    |            |
-       	       	    |            |
-		            |            |
-		            |            |
-		            |            |
-		            +------------+
-
- */
+size_t				size_with_offset(size_t size);
+size_t				size_no_offset(size_t size);
 
 typedef void		     	*t_ptr_generic;
 
@@ -46,29 +18,26 @@ typedef struct	s_alloc    	*t_ptr_alloc;
 typedef struct	s_alloc    	*t_memory;
 struct				    	s_alloc;
 {
-  t_ptr_generic		ptr;
-  size_t	      	size;
-  bool			available;
-  t_ptr_alloc	      	next;
+	t_ptr_generic		ptr;
+	size_t				size;
+	bool				available;
+	t_ptr_alloc	      	next;
 };
 
-size_t				size_with_offset(size_t size);
-size_t				size_no_offset(size_t size);
 void		    	alloc_init(t_ptr_alloc alloc);
-
 
 typedef struct	   		s_page t_page;
 typedef struct	   		s_page *t_ptr_page;
 struct		      		s_page {
-  t_memory	      	layout;
-  size_t	      	quota;
-  size_t			n_alloced;
-  t_ptr_page	    next;
+	t_memory	    layout;
+	size_t			quota;
+	size_t			n_alloced;
+	t_ptr_page	    next;
 };
 
 struct				s_arena_info {
-  int			page_size;
-  int			page_index;
+	int			page_size;
+	int			page_index;
 };
 
 void					get_arena_info(struct arena_info *info, size_t size);

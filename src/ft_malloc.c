@@ -1,42 +1,42 @@
 #include "ft_malloc.h"
 
 static inline t_ptr_page        first_fit_page(t_ptr_page page, size_t size) {
-  struct arena_info info;
-  while (page->next != NULL && page->quota < size_offset(size)) {
-    page = page->next;
-  }
-  if (page->next == NULL && page->quota < size_offset(size)) {
-    get_arena_info(&info, size);
-    page_init(&page->next, info.page_size);
-    page = page->next;
-  }
-  return page;
+	struct arena_info info;
+	while (page->next != NULL && page->quota < size_offset(size)) {
+		page = page->next;
+	}
+	if (page->next == NULL && page->quota < size_offset(size)) {
+		get_arena_info(&info, size);
+		page_init(&page->next, info.page_size);
+		page = page->next;
+	}
+	return page;
 }
 
 static inline t_ptr_page	best_fit_page(t_ptr_page page, size_t size) {
-  struct arena_info	info;
-  bool			found;
-  t_ptr_page		tmp;
+	struct arena_info	info;
+	bool			found;
+	t_ptr_page		tmp;
 
-  found = false;
-  tmp = NULL;
-  while (page->next != NULL) {
-    if (page->quota >= size_offset(size)) {
-      if (tmp != NULL && page->quota < tmp->quota) {
-	tmp = page;
-      }
-      found = true;
-    }
-    page = page->next;
-  }
-  if (!found) {
-    get_arena_info(&info, size);
-    page_init(&page->next, info.page_size);
-    page = page->next;
-    assert(tmp == NULL);
-    tmp = page;
-  }
-  return tmp;
+	found = false;
+	tmp = NULL;
+	while (page->next != NULL) {
+		if (page->quota >= size_offset(size)) {
+			if (tmp != NULL && page->quota < tmp->quota) {
+				tmp = page;
+			}
+			found = true;
+		}
+		page = page->next;
+	}
+	if (!found) {
+		get_arena_info(&info, size);
+		page_init(&page->next, info.page_size);
+		page = page->next;
+		assert(tmp == NULL);
+		tmp = page;
+	}
+	return tmp;
 }
 
 typedef t_ptr_page	(*t_fetch_algorithm)(t_ptr_page page, size_t size);
@@ -64,17 +64,17 @@ void				*ft_malloc(size_t size) {
 }
 
 void				*ft_realloc(void *ptr, size_t size) {
-  if (ptr == NULL && size != 0) {
-    return ft_malloc(size);
-  } else if (ptr != NULL && size == 0) {
-    ft_free(ptr);
-    return ptr;
-  }
+	if (ptr == NULL && size != 0) {
+		return ft_malloc(size);
+	} else if (ptr != NULL && size == 0) {
+		ft_free(ptr);
+		return ptr;
+	}
 
-  assert(is_valid_memory_ptr(ptr));
-  return NULL;
+	assert(is_valid_memory_ptr(ptr));
+	return NULL;
 }
 
 void				*ft_calloc(size_t n_elems, size_t size) {
-  return ft_malloc(size * n_elems);
+	return ft_malloc(size * n_elems);
 }

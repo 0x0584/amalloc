@@ -11,9 +11,9 @@ void				*ft_calloc(size_t n_elems, size_t size);
 void				ft_free(void *ptr);
 
 struct				s_alloc_info {
-  t_chunk		chunk;
-  t_page		page;
-  struct s_arena_info	arena;
+	t_chunk				chunk;
+	t_page				page;
+	struct s_arena_info	arena;
 };
 
 void				alloc_info_init(t_generic_ptr ptr, struct s_alloc_info *info);
