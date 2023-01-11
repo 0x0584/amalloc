@@ -1,0 +1,22 @@
+* memory
+** zones
+
+- tiny
+- small
+- large
+
+** page
+
+linked list
+
+- tiny small hold many objects by design
+- large may also hold many objects but just in case of a leftover memory
+  + normally, large objects are allocated a size that will at least fit the whole object specifically
+
+* routines
+** malloc
+- allocate memory always less than MAX_SIZE_PER_ALLOC
+- if size if zero, UB
+- "on failure", return NULL
+
+*** failure
