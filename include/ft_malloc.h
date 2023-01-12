@@ -6,10 +6,20 @@
 
 #include "memory.h"
 
+/*
+** NULL is returned if:
+**
+**  - the size is > LARGE_ZONE_MAX_SIZE
+*/
 void				*ft_malloc(size_t size);
 void				*ft_calloc(size_t n_elems, size_t size);
 void				ft_free(void *ptr);
 
+/*
+ * allocation routine, based on `alloc_size' and its ZONE,
+ *   - we may either find a page
+ *   - or create a new page if no memory is found in amongst all pages
+ */
 void				get_alloc_page(size_t alloc_size);
 
 
