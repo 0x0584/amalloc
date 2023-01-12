@@ -1,0 +1,179 @@
+
+    page of size page_size
+
+     +-------------+<--------------------------| base pointer returned by mmap
+     | layout      +------+
+     | quota       |      |
+     | next page   |+-----v------+
+     +-------------+| ptr        +-------+  ptr always points to the offset of the base pointer
+                    | size       |       |  size without the offset
+                    | available  |       |  true if the chunk is free
+             +------+ next       |       |  points to the next chunk, or NULL if it is the last
+             |      | ~~~~~~~~   <-------+
+             |      | ~~~~~~~    |
+             |      | ~~~~~~~~   |
+             |      | ~~~~~~~~~  |
+             |      | ~~~~~~~    |
+             +------> ptr        +-------+
+                    | size       |       |
+                    | available  |       |
+        NULL <------+ next       |       |
+                    |            <-------+
+                    |            |
+                    |            |
+                    |            |
+                    |            |
+                    |            |
+                    +------------+
+
+
+
+
+
+
+  Memory layout after successful allocation
+
+   - allocation cases, not all allocations utilise the whole available memory
+   - a fragment is a memory that is unusable because is
+   - allocation might have a prev except when it is the page header
+      ==> every allocation is compare with base pointer of the page->layout and INFO
+      ==> every allocations may have a next, except for the last
+
+     Example of remaining                    Example of fragment
+     available memory                        after allcoation
+
+     +-------------+                         +-------------+
+     | INFO        +-----+                   | INFO        +------next----->
+     +-------------+     |                   +-------------+
+     | ~~~~~~~~~   |     |                   | ~~~~~~~~~~  |
+     | ~~~~~~~~~~  |     |                   | ~~~~~~~~~~~ |
+     | ~~~~~~~~~~~ |    next                 | ~~~~~~~~    |
+     | ~~~~~~~~    |     |                   | ~~~~~~~~~   |
+     | ~~~~~~~~~   |     |                   | ~~~~~~~~~~  |
+     | ~~~~~~~~    |     |                   | ~~~~~~~~    |
+     +-------------+ <---+                   +-------------+
+     | INFO        +-------next--->          | +++++++++++ |  fragment
+     +-------------+                         | +++++++++++ |
+     | ___________ |                         +-------------+
+     | ___________ |  remaining memory
+     +-------------+
+
+             ~~~~~~~~ indicates the allocated memory for the pointer
+             ________ indicates the remaining memory (= size + offset)
+             ++++++++ indicates a fragmant, which is unused memory
+
+     - invariant (1): the remainig memory > offset
+       => property: fragmant < offset
+
+     - invariant (2): the remaining memory will follow to the next allocation
+                      except when it's a leaf, then it is NULL terminated
+
+
+
+
+
+
+
+  I) append allocation
+
+
+  before allocation
+
+     +-------------+
+     | INFO        |
+     +-------------+  ----------------------------- alloc info #1  <-------------- available memory
+     | ___________ |                                     |
+     | ___________ |                                     |
+     | ___________ |                                     |
+     | ___________ |                                    next
+     | ___________ |                                     |
+     | ___________ |                                     |
+     | ___________ |                                     |
+     +-------------+                                     |
+                                                         |
+                                                         +-----> NULL
+
+  after allocation
+
+     +-------------+
+     | INFO        |
+     +-------------+  ----------------------------- alloc info #1
+     | ~~~~~~~~~~~ |                                     |
+     | ~~~~~~~~    |                                     |
+     | ~~~~~~      |                                     |
+     | ~~~~~~~~~~  |                                    next
+     +-------------+                                     |
+     | INFO        |  ------------------------------ alloc info #2   <-------------- available memory
+     +-------------+                                     |
+     | ___________ |                                     |
+     +-------------+                                    next
+                                                         |
+                                                         +-----> NULL
+
+
+  II) insert allocation
+
+
+
+  before allocation
+
+     +-------------+
+     | INFO        |
+     +-------------+  ----------------------------- alloc info #1  <-------------- available memory
+     | ___________ |                                     |
+     | ___________ |                                     |
+     | ___________ |                                     |
+     | ___________ |                                    next
+     | ___________ |                                     |
+     | ___________ |                                     |
+     | ___________ |                                     v
+     +-------------+  ----------------------------- alloc info #2
+     | INFO        |                                     |
+     +-------------+                                     |
+     | ~~~~~~~     |                                    next
+     +-------------+                                     |
+                                                         |
+                                                         +-----> NULL
+  after allocation
+
+     +-------------+  ----------------------------- page info
+     | INFO        |
+     +-------------+  ----------------------------- alloc info #1
+     +-------------+                                     |
+     | ~~~~~~~~~~  |                                     |
+     | ~~~~~~~~~   |                                    next
+     | ~~~~~       |                                     |
+     | ~~~~~~~~    |                                     v
+     +-------------+  ----------------------------- alloc info #3  <-------------- available memory
+     | INFO        |                                     |
+     +-------------+                                    next
+     | ___________ |   remaining memory                  |
+     | ___________ |                                     v
+     +-------------+  ----------------------------- alloc info #2
+     | INFO        |                                     |
+     +-------------+                                     |
+     | ~~~~~~~     |                                    next
+     +-------------+                                     |
+                                                         |
+                                                         +-----> NULL
+
+  Memory layout after release
+
+     +-------------+                         +-------------+
+     | INFO        +-----+                   | INFO        +------next-----> NULL
+     +-------------+     |                   +-------------+
+     | ___________ |     |                   | ___________ |
+     | ___________ |     |                   | ___________ |
+     | ___________ |    next                 | ___________ |
+     | ___________ |     |                   | ___________ |
+     | ___________ |     |                   | ___________ |
+     | ___________ |     |                   | ___________ |
+     | ___________ | <---+                   +-------------+
+     | ___________ |                         | +++++++++++ | fragment
+     | ___________ |                         | +++++++++++ |
+     | ___________ |                         +-------------+
+     | ___________ |
+     +-------------+
+
+
+	 FIXME: defragmentation
