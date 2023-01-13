@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   memory.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/09 23:33:43 by archid-           #+#    #+#             */
+/*   Updated: 2023/01/12 23:40:31 by archid-          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MEMORY_H
 #define MEMORY_H
 
@@ -7,9 +19,11 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>
-#include <signals.h>
+#include <signal.h>
 #include <sys/mman.h>
 #include <stdbool.h>
+
+//#include "t_set.h"
 
 /*
 **
@@ -27,7 +41,7 @@ typedef void		     	*t_ptr_generic;
 typedef struct	s_alloc    	t_alloc;
 typedef struct	s_alloc    	*t_ptr_alloc;
 
-struct				    	s_alloc;
+struct				    	s_alloc
 {
 	/*
 	** points to the beginning of available memory
@@ -109,7 +123,14 @@ struct						s_page {
 	t_ptr_page	    next;
 };
 
+/*
+** page constructor, allocates memory using `mmap()'
+*/
 void		      	    	page_init(t_ptr_page page);
+
+/*
+**
+*/
 void				    	page_del(t_ptr_page *page);
 
 t_ptr_alloc	          		page_alloc(t_ptr_page page, size_t size, const size_t hard_limit);
@@ -117,15 +138,16 @@ t_ptr_alloc	          		page_alloc(t_ptr_page page, size_t size, const size_t ha
 void				    	page_release_alloc(t_ptr_page page, t_ptr_alloc alloc);
 
 
-struct						s_arena_info {
+struct						s_arena_info
+{
 	int			page_size;
 	int			page_index;
 };
 
-void						get_arena_info(struct arena_info *info, size_t size);
+void						get_arena_info(struct s_arena_info *info, size_t size);
 
 
 extern t_ptr_page 		    g_arena[3];
-extern t_set			    g_alloced;
+//extern t_set			    g_allocs;
 
 #endif /* MEMORY_H */

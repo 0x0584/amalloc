@@ -1,15 +1,34 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_malloc.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/09 23:33:05 by archid-           #+#    #+#             */
+/*   Updated: 2023/01/12 23:37:37 by archid-          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_malloc.h"
 
-static t_ptr_page			get_alloc_page(size_t current_alloc_size)
+/*
+ * allocation routine, based on `alloc_size' and its ZONE,
+ *   - we may either find a page
+ *   - or create a new page if no memory is found in amongst all pages
+ */
+
+static t_ptr_page			get_alloc_page(size_t alloc_size)
 {
     register struct page_info	info;
 	t_ptr_page					page;
 
-    get_page_info(&info, current_alloc_size);
+    get_page_info(&info, alloc_size);
     if (g_arena[info.index].mem != NULL)
-        page_init(&g_arena[info.index], info.page_size);
-	page = fetch_page(g_arena + info.index, size);
-	if (page->next == NULL && page->quota < size_offset(size))
+        if (!page_init(&g_arena[info.index], info.page_size))
+			return NULL;
+	page = fetch_page(g_arena + info.index, alloc_size);
+	if (page->next == NULL && page->quota < size_offset(alloc_size))
 	{
 		get_arena_info(&info, size);
 		page_init(&page->next, info.page_size);
@@ -23,7 +42,8 @@ void						*ft_malloc(size_t size) {
 	t_ptr_page	page;
 	t_ptr_alloc alloc;
 
-	page = get_alloc_page(size);
+	if ((page = get_alloc_page(size)) == NULL)
+		return NULL;
 	if (size <= TINY_ZONE_MAX_SIZE)
 		alloc = page_alloc(page, size, TINY_ZONE_MAX_SIZE);
 	else if (size <= SMALL_ZONE_MAX_SIZE)

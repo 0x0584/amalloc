@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   t_set.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/09 23:33:05 by archid-           #+#    #+#             */
+/*   Updated: 2023/01/12 23:39:57 by archid-          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "t_set.h"
 
 t_set set_alloc(t_del del, t_cmp cmp) {
@@ -23,7 +35,7 @@ size_t set_size(t_set s) {
 bool set_probe(t_set s, const void *ptr) {
 	t_hashnode *tmp;
 
-	if (!s || !blob)
+	if (!s || !ptr)
 		return (false);
 	walk = lst_front(s->array[hash]);
 	while (walk)

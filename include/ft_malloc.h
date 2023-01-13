@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_malloc.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/09 23:33:05 by archid-           #+#    #+#             */
+/*   Updated: 2023/01/12 23:34:57 by archid-          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef FT_MALLOC_H
 #define FT_MALLOC_H
 
@@ -15,16 +27,9 @@ void				*ft_malloc(size_t size);
 void				*ft_calloc(size_t n_elems, size_t size);
 void				ft_free(void *ptr);
 
-/*
- * allocation routine, based on `alloc_size' and its ZONE,
- *   - we may either find a page
- *   - or create a new page if no memory is found in amongst all pages
- */
-void				get_alloc_page(size_t alloc_size);
-
-
-struct				s_alloc_info {
-	t_chunk				chunk;
+struct				s_alloc_info
+{
+	t_alloc				chunk;
 	t_page				page;
 	struct s_arena_info	arena;
 };

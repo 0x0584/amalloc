@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   memory.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/09 23:33:05 by archid-           #+#    #+#             */
+/*   Updated: 2023/01/12 23:39:20 by archid-          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "memory.h"
 
 size_t          size_offset(size_t size)
@@ -10,30 +22,37 @@ size_t          size_no_offset(size_t size)
     return size - sizeof(t_chunk);
 }
 
-bool			alloc_init(t_ptr_chunk chunk, size_t page_size, const size_t max_size)
+bool			alloc_init(t_ptr_alloc chunk, size_t size, const size_t max_size)
 {
-    assert(mmap_ptr != NULL);
-    assert(chunk_size != 0);
-    assert(chunk_size < MAX_CHUNK_SIZE);
+    assert(chunk != NULL);
+    assert(size > sizeof(t_alloc));
 
-    chunk->ptr = (unsigned char *)mmap_ptr + sizeof(t_chunk);
+    chunk->ptr = (unsigned char *)chunk + sizeof(t_chunk);
     chunk->size = size_no_offset(mmap_page_size);
     chunk->available = true;
     chunk->next = NULL;
     return true;
 }
 
-void			page_init(t_ptr_page page, int page_size)
+bool			page_init(t_ptr_page *page_ref, int page_size)
 {
-    assert(page != NULL);
-    assert(page->layout == NULL);
-    assert(page_size > sizeof(t_chunk));
+	t_ptr_page page;
 
-    page->layout = mmap(NULL, page_size, PROT_NONE, MAP_ANON, -1, 0);
-    chunk_init(&page->mem, page->mem, page_size);
+    ASSERT(page_ref != NULL);
+	ASSERT(page_size % getpagesize() == 0);
+
+	*page_ref = mmap(NULL, page_size, PROT_READ | PROT_WRITE | PROT_EXEC,
+					 MAP_ANON | MAP_PRIVATE, -1, 0);
+	if (*page_ref == MAP_FAILED)
+		return false;
+	page = *page_ref;
+
+    page->layout = (unsigned char *)page + sizeof(t_page);
+    alloc_init(&page->mem, page->mem, page_size);
     page->n_alloced = 0;
     page->quota = page_size;
     page->next = NULL;
+	return true;
 }
 
 void			page_del(t_ptr_page *page)

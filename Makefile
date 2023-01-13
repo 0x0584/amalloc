@@ -1,11 +1,13 @@
-ifeq($(HOSTTYPE),)
+
+ifeq ($(HOSTTYPE),)
 HOSTTYPE := $(shell uname -m)-$(shell uname -s)
 endif
 
 LIB=libft_malloc
-LIB_FILE=$(LIB)_$(HOESTTYPE).so
+LIB_DIR=$(shell pwd)
+LIB_FILE=$(LIB_DIR)/$(LIB)_$(HOESTTYPE).so
 
-FTDIR=libft
+FT=libft
 
 SRCDIR=src
 INCLUDE=include
@@ -18,10 +20,10 @@ HEADERS:=$(shell find $(INCLUDE) -type f -name '*.h')
 OBJS:=$(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
 
 CC=clang
-CFLAGS=-Wall -Wextra -I$(INCLUDE) -I$(FTDIR)
+CFLAGS=-Wall -Wextra -I$(INCLUDE) -I$(FT)
 CXX=clang++
 CXXFLAGS=$(CFLAGS) -std=c++14
-LDFLAGS=-shared
+LDFLAGS=-shared -L$(FT) -l$(FT)
 
 GTEST_DIR=googletest
 GTEST_SRCS=$(GTEST_DIR)/src/gtest{,_main}.cc
@@ -32,11 +34,16 @@ TEST_DIR=tests
 TEST_SRCS:=$(shell find $(TEST_DIR) -type f -name '*.cc')
 TESTS:=$(patsubst $(TEST_DIR)/%.cc,$(TEST_DIR)/%.test,$(TEST_SRCS))
 
+all: ft $(LIB)
 
-all: $(LIB)
+ft:
+	$(MAKE) -C $(FT)
 
-$(LIB): $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $(LIB_FILE) $(LDFLAGS)
+$(LIB): ft $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(LIB_FILE) $(LDFLAGS)
+#	setenv DYLD_LIBRARY_PATH $(LIB_DIR)
+#   setenv DYLD_INSERT_LIBRARIES $(LIB_FILE)
+#   setenv DYLD_FORCE_FLAT_NAMESPACE 1
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 	$(CC) $(CFLAGS) $< -o $@
@@ -52,9 +59,4 @@ $(TEST_DIR)/%.test: $(TEST_DIR)/%.cc $(INCLUDES)
 
 re: clean all
 
-
-
-
-
-
-
+.PHONY: ft re all clean test
