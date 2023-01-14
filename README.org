@@ -20,3 +20,17 @@ linked list
 - "on failure", return NULL
 
 *** failure
+
+
+* TODOs [1/3]
+
++ [X] ~added hasher algo to hash table~
++ [-] fix compilation
+  + [-] verify zone allocation
+    + [X] slice_memory
+    + [ ]
++ [ ]
+
+* Resources
+
+- [[https://en.wikipedia.org/wiki/Position-independent_code][PIC compilation]]

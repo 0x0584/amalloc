@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_malloc.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 23:33:05 by archid-           #+#    #+#             */
-/*   Updated: 2023/01/12 23:34:57 by archid-          ###   ########.fr       */
+/*   Updated: 2023/01/14 20:46:38 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,26 +18,17 @@
 
 #include "memory.h"
 
+typedef t_ptr_page			(*t_fetch_algorithm)(t_ptr_page root_page, size_t size);
+
+extern t_fetch_algorithm	fetch_page;
+
 /*
 ** NULL is returned if:
 **
 **  - the size is > LARGE_ZONE_MAX_SIZE
 */
-void				*ft_malloc(size_t size);
-void				*ft_calloc(size_t n_elems, size_t size);
-void				ft_free(void *ptr);
-
-struct				s_alloc_info
-{
-	t_alloc				chunk;
-	t_page				page;
-	struct s_arena_info	arena;
-};
-
-void				alloc_info_init(t_generic_ptr ptr, struct s_alloc_info *info);
-
-typedef t_ptr_page			(*t_fetch_algorithm)(t_ptr_page root_page, size_t size);
-
-extern t_fetch_algorithm	fetch_page;
+void			        	*ft_malloc(size_t size);
+void			        	*ft_calloc(size_t n_elems, size_t size);
+void			        	ft_free(void *ptr);
 
 #endif /* FT_MALLOC_H */

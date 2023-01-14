@@ -3,27 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   memory.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 23:33:43 by archid-           #+#    #+#             */
-/*   Updated: 2023/01/12 23:40:31 by archid-          ###   ########.fr       */
+/*   Updated: 2023/01/14 20:47:27 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MEMORY_H
-#define MEMORY_H
+# define MEMORY_H
 
-#include <assert.h>
-#define ASSERT assert
+# include <assert.h>
+# define ASSERT assert
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/mman.h>
-#include <stdbool.h>
+# include <stdlib.h>
+# include <stdint.h>
+# include <unistd.h>
+# include <signal.h>
+# include <sys/mman.h>
+# include <stdbool.h>
 
-//#include "t_set.h"
+# include "libft.h"
+
+#include "t_set.h"
 
 /*
 **
@@ -68,25 +70,9 @@ struct				    	s_alloc
 };
 
 /*
-** the offset is always considered of the allocation
-**
-** although the page has an offset too these functions are utilitises
-** to adjust for the offset of `s_alloc'
-*/
-size_t						size_with_offset(size_t size);
-size_t						size_no_offset(size_t size);
-
-/*
 **
 */
-void						alloc_init(t_ptr_alloc alloc);
-
-#define ZONE_NUM_ELEMENTS 128
-
-// FIXME: make max_sizes relative to sys_page_size
-#define TINY_ZONE_MAX_SIZE 32
-#define SMALL_ZONE_MAX_SIZE 512
-#define LARGE_ZONE_MAX_SIZE 2048
+bool						alloc_init(t_ptr_alloc chunk, size_t size);
 
 /*
 ** a page is allocated via `mmap()' where the size is considered as a buffer that
@@ -124,30 +110,42 @@ struct						s_page {
 };
 
 /*
+** the offset is always considered of the allocation
+**
+** although the page has an offset too these functions are utilitises
+** to adjust for the offset of `s_alloc'
+*/
+size_t						size_offset(size_t size);
+
+# define ZONE_NUM_ELEMENTS 128
+# define PAGE_SIZE(__S) (ZONE_NUM_ELEMENTS * size_offset(__S))
+
+// FIXME: make max_sizes relative to sys_page_size
+# define TINY_ZONE_MAX_SIZE 32
+# define SMALL_ZONE_MAX_SIZE 512
+# define LARGE_ZONE_MAX_SIZE 2048
+
+
+/*
 ** page constructor, allocates memory using `mmap()'
 */
-void		      	    	page_init(t_ptr_page page);
+bool						page_construct(t_ptr_page page, int page_size);
+bool						page_init(t_ptr_page *page_ref, int page_size);
 
 /*
 **
 */
 void				    	page_del(t_ptr_page *page);
 
-t_ptr_alloc	          		page_alloc(t_ptr_page page, size_t size, const size_t hard_limit);
+/*
+** @return the remaining memory if available or pointer to ta fragment
+*/
+t_ptr_alloc	          		page_alloc(t_ptr_page page, size_t size, const ssize_t size_limit);
 
 void				    	page_release_alloc(t_ptr_page page, t_ptr_alloc alloc);
+t_ptr_page					fetch_alloc_page(t_ptr_alloc chunk);
 
-
-struct						s_arena_info
-{
-	int			page_size;
-	int			page_index;
-};
-
-void						get_arena_info(struct s_arena_info *info, size_t size);
-
-
-extern t_ptr_page 		    g_arena[3];
-//extern t_set			    g_allocs;
+extern t_page				g_arena[3];
+extern t_hashtable			g_alloced;
 
 #endif /* MEMORY_H */

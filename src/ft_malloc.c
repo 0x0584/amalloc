@@ -6,11 +6,12 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 23:33:05 by archid-           #+#    #+#             */
-/*   Updated: 2023/01/12 23:37:37 by archid-          ###   ########.fr       */
+/*   Updated: 2023/01/14 16:31:27 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_malloc.h"
+#include "alloc_info.h"
 
 /*
  * allocation routine, based on `alloc_size' and its ZONE,
@@ -20,25 +21,26 @@
 
 static t_ptr_page			get_alloc_page(size_t alloc_size)
 {
-    register struct page_info	info;
-	t_ptr_page					page;
+    struct s_page_info	info;
+	t_ptr_page			page;
 
     get_page_info(&info, alloc_size);
-    if (g_arena[info.index].mem != NULL)
-        if (!page_init(&g_arena[info.index], info.page_size))
+    if (g_arena[info.page_index].layout != NULL)
+        if (!page_construct(&g_arena[info.page_index], info.page_size))
 			return NULL;
-	page = fetch_page(g_arena + info.index, alloc_size);
+	page = fetch_page(g_arena + info.page_index, alloc_size);
 	if (page->next == NULL && page->quota < size_offset(alloc_size))
 	{
-		get_arena_info(&info, size);
+		get_page_info(&info, alloc_size);
 		page_init(&page->next, info.page_size);
 		page = page->next;
 	}
-	ASSERT(page->quota > size_offset(size));
+	ASSERT(page->quota > size_offset(alloc_size));
 	return page;
 }
 
-void						*ft_malloc(size_t size) {
+void						*ft_malloc(size_t size)
+{
 	t_ptr_page	page;
 	t_ptr_alloc alloc;
 
@@ -53,24 +55,26 @@ void						*ft_malloc(size_t size) {
 	else
 		return NULL;
 	ASSERT(alloc != NULL);
-	ASSERT(is_valid_alloc_ptr(alloc->ptr));
+	ASSERT(is_valid_memory_ptr(alloc->ptr));
 	return alloc->ptr;
 }
 
-void						*ft_realloc(void *ptr, size_t size) {
+void						*ft_realloc(void *ptr, size_t size)
+{
 	if (ptr == NULL && size != 0)
 		return ft_malloc(size);
 	else if (ptr != NULL && size == 0)
 	{
 		ft_free(ptr);
-		ASSERT(!is_valid_alloc_ptr(ptr));
+		ASSERT(!is_valid_memory_ptr(ptr));
 		return ptr;
 	}
 	return NULL;
 }
 
-void						*ft_calloc(size_t n_elems, size_t size) {
-	void *mem;
+void						*ft_calloc(size_t n_elems, size_t size)
+{
+	void			*mem;
 
 	mem = ft_malloc(size * n_elems);
 	ft_memset(mem, 0, size * n_elems);
