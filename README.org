@@ -1,3 +1,7 @@
+* ft_malloc
+
+[[https://github.com/github/docs/actions/workflows/main.yml/badge.svg][example workflow]]
+
 * memory
 ** zones
 

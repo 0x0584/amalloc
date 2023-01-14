@@ -1,0 +1,17 @@
+name: Code Compilation
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: make
+      run: git pull --recurse-submodules && git submodule update --remote --recursive && make

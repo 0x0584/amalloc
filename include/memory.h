@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 23:33:43 by archid-           #+#    #+#             */
-/*   Updated: 2023/01/14 20:47:27 by archid-          ###   ########.fr       */
+/*   Updated: 2023/01/15 18:03:52 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MEMORY_H
 
 # include <assert.h>
+
 # define ASSERT assert
 
 # include <stdlib.h>
@@ -23,9 +24,12 @@
 # include <sys/mman.h>
 # include <stdbool.h>
 
-# include "libft.h"
+//# include "t_set.h"
 
-#include "t_set.h"
+void						*ft_memcpy(unsigned char *dst,
+									   const unsigned char *src,
+									   const size_t size);
+void						ft_bzero(unsigned char *buff, const size_t size);
 
 /*
 **
@@ -143,9 +147,13 @@ void				    	page_del(t_ptr_page *page);
 t_ptr_alloc	          		page_alloc(t_ptr_page page, size_t size, const ssize_t size_limit);
 
 void				    	page_release_alloc(t_ptr_page page, t_ptr_alloc alloc);
-t_ptr_page					fetch_alloc_page(t_ptr_alloc chunk);
 
 extern t_page				g_arena[3];
-extern t_hashtable			g_alloced;
+
+/* TODO: to access pages from allocation, a hashtable is used
+ * to map chunk with their pages */
+
+//extern t_hashtable			g_alloced;
+t_ptr_page					fetch_alloc_page(t_ptr_alloc chunk);
 
 #endif /* MEMORY_H */

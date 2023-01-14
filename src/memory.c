@@ -6,11 +6,36 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 23:33:05 by archid-           #+#    #+#             */
-/*   Updated: 2023/01/14 16:45:22 by archid-          ###   ########.fr       */
+/*   Updated: 2023/01/15 18:14:46 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "memory.h"
+
+void					*ft_memcpy(unsigned char *dst, const unsigned char *src,
+								   const size_t size)
+{
+	size_t i;
+
+	i = 0;
+	while (i < size)
+	{
+		dst[i] = (unsigned char)src[i];
+		++i;
+	}
+	return dst;
+}
+
+void					ft_bzero(unsigned char *buff, const size_t size)
+{
+	size_t i;
+
+	i = 0;
+	while (i < size)
+	{
+		buff[++i] = 0;
+	}
+}
 
 size_t					size_offset(size_t size)
 {
@@ -129,12 +154,15 @@ void					page_release_alloc(t_ptr_page page, t_ptr_alloc alloc)
 
 t_ptr_page				fetch_alloc_page(t_ptr_alloc chunk)
 {
-	t_ptr_page page;
+	/*
+	  t_ptr_page page;
 
-	ASSERT(g_alloced != NULL);
-	page = hashtable_get(g_alloced, chunk, NULL);
-	ASSERT(page != NULL);
-	return page;
+	  ASSERT(g_alloced != NULL);
+	  page = hashtable_get(g_alloced, chunk, NULL);
+	  ASSERT(page != NULL);
+	  return page;
+	*/
+	return NULL;
 }
 
 #define DEFAULT_SIZE_FACTOR 16
@@ -145,4 +173,4 @@ t_page					g_arena[3] = {
 	{NULL, 0, 0, NULL},
 };
 
-t_hashtable					g_alloced = NULL;
+//t_hashtable					g_alloced = NULL;

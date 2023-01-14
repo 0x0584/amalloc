@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 23:33:05 by archid-           #+#    #+#             */
-/*   Updated: 2023/01/14 03:25:36 by archid-          ###   ########.fr       */
+/*   Updated: 2023/01/15 18:13:25 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void		alloc_info(t_ptr_generic ptr, struct s_alloc_info *info) {
 	assert(info != NULL);
 	assert(is_valid_memory_ptr(ptr));
 	t_alloc chunk;
-	ft_memcpy(&chunk, ptr, sizeof(t_alloc));
+	ft_memcpy((void *)&chunk, ptr, sizeof(t_alloc));
 
 }
 
@@ -45,7 +45,8 @@ void		get_page_info(struct s_page_info *info, size_t size) {
 
 void        show_alloc_mem()
 {
-	ft_printf("TINY ZONE has ");
+	char buff[] = "TINY ZONE has ";
+	write(1, buff, sizeof(buff));
 }
 
 bool		is_valid_memory_ptr(t_ptr_generic ptr)

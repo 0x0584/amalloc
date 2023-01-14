@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 23:33:05 by archid-           #+#    #+#             */
-/*   Updated: 2023/01/14 16:31:27 by archid-          ###   ########.fr       */
+/*   Updated: 2023/01/15 18:15:59 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ static t_ptr_page			get_alloc_page(size_t alloc_size)
 
 void						*ft_malloc(size_t size)
 {
+	return NULL;
 	t_ptr_page	page;
 	t_ptr_alloc alloc;
 
@@ -77,7 +78,7 @@ void						*ft_calloc(size_t n_elems, size_t size)
 	void			*mem;
 
 	mem = ft_malloc(size * n_elems);
-	ft_memset(mem, 0, size * n_elems);
+	ft_bzero(mem, size * n_elems);
 	return mem;
 }
 
